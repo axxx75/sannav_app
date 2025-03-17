@@ -1,0 +1,108 @@
+html, body {
+   height: 100%;
+   margin: 0;
+   background: linear-gradient(135deg, #ffff00, #ffffff);  /* Gradiente Blu -> Viola */
+   display: flex;
+   flex-direction: column;
+
+}
+
+/* Container fluido che sfrutta l'intera altezza della pagina */
+.full-page {
+   height: 100%;
+   display: flex;
+   flex-direction: column;
+}
+
+/* Header fisso in alto */
+.page-header {
+   #background: #ffff00;
+   background: linear-gradient(135deg, #ffff00, #ffffff);  /* Gradiente Blu -> Viola */
+   color: #000000;
+   padding: 12px;
+   text-align: center;
+   margin-bottom: 10px; /* Aggiunto margine inferiore per separare i bottoni */
+   border-radius: 10px; /* Smussa i bordi */
+   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2); /* Ombra per effetto elevato */
+   text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5); /* Ombra per migliorare la leggibilità */
+}
+
+/* L'area della tabella occupa lo spazio rimanente */
+.table-container {
+   flex-grow: 1;
+   overflow: auto;
+   padding: 10px;
+}
+
+/* Input di ricerca in ogni colonna */
+table.dataTable thead input {
+   width: 100%;
+   padding: 3px;
+   box-sizing: border-box;
+}
+
+/* Posizionamento bottoni di export */
+.export-buttons {
+   margin-bottom: 20px;
+   text-align: center; /* Centra i bottoni */
+}
+
+.export-buttons button {
+   margin-left: 5px;
+   margin-right: 5px; /* Distanza tra i bottoni */
+}
+/* Sezione per la selezione del numero di righe per pagina */
+.page-length-select {
+   margin-bottom: 10px;
+   text-align: center;
+}
+
+.column-toggle {
+   margin-top: 10px;
+   text-align: center;
+}
+
+/* Caricamento dati - overlay */
+.loading-overlay {
+   position: fixed;
+   top: 0;
+   left: 0;
+   width: 100%;
+   height: 100%;
+   background: linear-gradient(135deg, #ffff00, #FEFDC7);  /* Gradiente Blu -> Viola */
+   display: flex;
+   flex-direction: column;
+   justify-content: center;
+   align-items: center;
+   z-index: 9999;  /* Assicurati che il loader sia sopra tutto il resto */
+   opacity: 0;  /* Inizialmente invisibile */
+   animation: fadeIn 0.5s forwards;  /* Aggiungi l'animazione di fade-in */
+}
+
+/* Testo di caricamento */
+.loading-overlay p {
+   font-size: 1.5rem;  /* Aumenta la dimensione del testo */
+   font-weight: normal;
+   color: #209CEE;  /* Colore blu per il testo */
+   margin-top: 15px;  /* Aggiungi uno spazio tra il loader e il testo */
+}
+
+/* Animazione di fade-in per il loader */
+@keyframes fadeIn {
+   0% { opacity: 0; }
+   100% { opacity: 1; }
+}
+
+/* Spinner (loader) */
+.spinner-border {
+   width: 5rem;  /* Dimensione maggiore per renderlo pi.. visibile */
+   height: 5rem;
+   border-width: 0.75rem;  /* Aumenta lo spessore della circonferenza */
+}
+
+/* Animazione di chiusura del loader */
+@keyframes fadeOut {
+   0% { opacity: 1; }
+   100% { opacity: 0; }
+}
+
