@@ -55,7 +55,6 @@ COPY httpd.conf /etc/apache2/httpd.conf
 ADD page/ /var/www/localhost/htdocs/
 COPY app/* /app/
 EXPOSE 81
-EXPOSE 5001
 RUN echo '*/5*  **  * python /app/sannav_pg.py ' >> /etc/crontabs/root
 RUN /usr/bin/python -Wi  /app/sannav_pg.py
 ```
