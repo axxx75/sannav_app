@@ -113,9 +113,6 @@ At this point, you have a running a web server that expose the webpage with the 
 
 If you take a quick look at your containers, you should see at least one container running that's using the `sannav_app` image and on port `81`. To see your containers, you can use the CLI or Docker Desktop's graphical interface.
 
-{{< tabs >}}
-{{< tab name="CLI" >}}
-
 Run the `docker ps` command in a terminal to list your containers.
 
 ```console
@@ -125,19 +122,10 @@ docker ps
 Output similar to the following should appear.
 
 ```console
-CONTAINER ID        IMAGE               COMMAND                  CREATED             STATUS              PORTS                      NAMES
-d00a70f2b7a5        sannav_app     "/usr/bin/supervisor…"   2 minutes ago       Up 2 minutes        0.0.0.0:81->81/tcp, [::]:81->81/tcp, 0.0.0.0:5001->5001/tcp, [::]:5001->5001/tcp    sannav_app
+CONTAINER ID        IMAGE               COMMAND               CREATED             STATUS              PORTS                               NAMES
+d00a70f2b7a5        sannav_app     "/usr/bin/supervisor…"   2 minutes ago       Up 2 minutes        0.0.0.0:81->81/tcp, [::]:81->81/tcp    sannav_app
 ```
 
-{{< /tab >}}
-{{< tab name="Docker Desktop" >}}
-
-In Docker Desktop, select the **Containers** tab to see a list of your containers.
-
-![Docker Desktop with get-started container running](images/dashboard-two-containers.webp)
-
-{{< /tab >}}
-{{< /tabs >}}
 
 ## Summary
 
