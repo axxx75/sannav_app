@@ -5,6 +5,7 @@ import json
 import os
 import datetime
 import csv
+import gzip
 ip_sannav = "XXXXX"
 username = "XXXXX"
 password = "XXXXX"
