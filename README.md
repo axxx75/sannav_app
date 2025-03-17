@@ -131,5 +131,5 @@ d00a70f2b7a5        sannav_app     "/usr/bin/supervisor…"   2 minutes ago     
 
 Related information:
 
-- [Dockerfile reference](/reference/dockerfile/)
-- [docker CLI reference](/reference/cli/docker/)
+- [Dockerfile reference](https://docs.docker.com/reference/dockerfile/)
+- [docker CLI reference](https://docs.docker.com/reference/cli/docker/)
