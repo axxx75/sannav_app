@@ -1,6 +1,6 @@
-# What is SANnav_app?
+# What is SANnav App?
 
-SANnav_app is a containerized application used to see Inventry Ports used in fabric, disovered by [Brocade3 SANnav RestAPI](https://techdocs.broadcom.com/content/dam/broadcom/techdocs/us/en/pdf/fc-networking/software-sannav/sannav-240x-restapi.pdf)
+SANnav_app is a containerized application used to see Inventry Ports used in fabric, disovered by [Brocadee SANnav RestAPI](https://techdocs.broadcom.com/content/dam/broadcom/techdocs/us/en/pdf/fc-networking/software-sannav/sannav-240x-restapi.pdf)
 The application is very simple: there is a python script that runs 2 calls to SANnav to process a summary with the most useful info.
 
 ## Prerequisites
