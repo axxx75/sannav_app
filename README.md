@@ -89,7 +89,7 @@ Now that you have an image, you can run the application in a container using the
 1. Run your container using the `docker run` command and specify the name of the image you just created:
 
    ```console
-   docker run -d -p 81:81 -p 5001:5001 --name=sannav_app --restart=always sannav_app
+   docker run -d -p 81:81 --name=sannav_app --restart=always sannav_app
    ```
 
    The `-d` flag (short for `--detach`) runs the container in the background.
@@ -100,11 +100,11 @@ Now that you have an image, you can run the application in a container using the
    host and the container. The `-p` flag takes a string value in the format of
    `HOST:CONTAINER`, where `HOST` is the address on the host, and `CONTAINER`
    is the port on the container. The command publishes the container's port
-   50001 to `127.0.0.1:5001` (`localhost:5001`) on the host and port 81. Without the port
+   81 to `127.0.0.1:81` (`localhost:81`) on the host and port 81. Without the port
    mapping, you wouldn't be able to access the application from the host.
 
 2. After a few seconds, open your web browser to [http://localhost:81/sannavports.php](http://localhost:81/sannaports.php).
-   You should see your app.
+   You should see your SANnav App.
 
    ![anteprima webpage](images/anteprima_webpage.png)
 
