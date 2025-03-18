@@ -40,6 +40,7 @@ EXPOSE 80
 
 # Imposta cron per discover san ogni 5 minuti
 RUN echo '*/5  *  *  *  * python /app/sannav_pg.py ' >> /etc/crontabs/root
+RUN echo '10  *  *  *  * python /app/output_bk.py ' >> /etc/crontabs/root
 
 # Eseguo la Discovery San per partire con dati nuovi e aggiornati
 RUN /usr/bin/python -Wi  /app/sannav_pg.py
