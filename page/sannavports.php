@@ -40,7 +40,7 @@
             }
          ?>
       </div>
-    
+
       <!-- Sezione Bottoni Export -->
       <div class="export-buttons">
            <button id="exportCSV" class="btn btn-primary">Export to CSV</button>
@@ -83,7 +83,7 @@
    <script src="static/js/FileSaver.min.js"></script>
 
    <script>
-   console.log("Il file JS sta eseguendo!"); 
+   console.log("Il file JS sta eseguendo!");
    //$(document).ready(function() {
    //    console.log("jQuery document ready!");
    //});
@@ -94,7 +94,7 @@
 
       // Carica e processa il CSV.gz
       fetch("result_json/output.csv.gz")
-        .then(response => response.text()) 
+        .then(response => response.text())
         .then(csvData => {
         Papa.parse(csvData, {
             skipEmptyLines: true,
@@ -116,7 +116,7 @@
                var searchRow = $('<tr></tr>').appendTo('#csvTable thead');
                headers.forEach(function(header, i) {
                   var th = $('<th></th>');
-                  if (!["ZONE", "RESULT_JSON"].includes(header)) {
+                  if (!["ZONE", "RESULT_JSON", "STATE", "STATUS"].includes(header)) {
                      th.html('<input type="text" placeholder="Cerca ' + header + '" />');
                   }
                   th.find('input').on('keyup change', function() {
@@ -136,7 +136,7 @@
                   tr += "</tr>";
                   $("#tableBody").append(tr);
                });
-   
+
                // Inizializza DataTable
                var table = $('#csvTable').DataTable({
                   orderCellsTop: true,
@@ -144,15 +144,17 @@
                   pageLength: 50,
                   language: { search: "Ricerca globale:" },
                   columnDefs: [
+                     { targets: headers.indexOf("STATUS"), visible: false },
+                     { targets: headers.indexOf("STATE"), visible: false },
                      { targets: headers.indexOf("ZONE"), visible: false },
                      { targets: headers.indexOf("RESULT_JSON"), visible: false }
                   ]
                });
-   
+
                // Genera i controlli per mostrare/nascondere le colonne
                headers.forEach(function(header, index) {
-                  var isVisible = !(header === "ZONE" || header === "RESULT_JSON");
-   
+                  var isVisible = !(header === "ZONE" || header === "RESULT_JSON" || header === "STATE" || header === "STATUS");
+
                   $('#columnToggles').append(`
                      <label>
                         <input type="checkbox" class="toggle-col" data-column="${index}" ${isVisible ? 'checked' : ''}>
@@ -174,7 +176,7 @@
                   column.visible(!column.visible());
                   table.columns.adjust().draw();
 
-                  // Se la colonna è visibile, aggiungi l'input di ricerca
+                  // Se la colonna è ora visibile, aggiungi l'input di ricerca
                   var searchTh = $('#csvTable thead tr:eq(1) th').eq(columnIndex);
                   if (column.visible() && !searchTh.find('input').length) {
                      searchTh.html('<input type="text" placeholder="Cerca ' + headers[columnIndex] + '" />');
