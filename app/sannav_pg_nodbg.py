@@ -277,8 +277,66 @@ def generate_csv():
 
             writer.writerow(merged_entry)
 
+def add_offline_ports():
+   base_dir = "/var/www/localhost/htdocs/result_json/"
+   device_file = os.path.join(base_dir, "device_port.json")
+   switch_file = os.path.join(base_dir, "switch_port.json")
+   offline_file = os.path.join(base_dir, "output.csv")
+
+   # Carica i dati JSON
+   device_data = load_json(device_file)
+   switch_data = load_json(switch_file)
+
+   # Campi richiesti per le porte offline
+   fields = [
+       "SWITCH", "P.IDX", "S/P", "SPEED", "SPEED_SUP",
+       "CTX", "CTX_NAME", "PHY/NPIV", "STATE", "STATUS", "WWPN", "ALIAS",
+       "ROLE", "ZONE"
+   ]
+
+   # Filtra le porte con stato "Offline"
+   offline_ports = [switch for switch in switch_data if switch.get("state") == "Offline"]
+
+   # Scrive i dati filtrati nel CSV
+   with open(offline_file, "a", newline="", encoding="utf-8") as csvfile:
+      writer = csv.DictWriter(csvfile, fieldnames=fields)
+
+      for switch in offline_ports:
+         speed = switch.get("speed", "Unknown")
+         if switch.get("speedNegotiated") == 1:
+            speed = "N" + str(speed)
+         else:
+            speed = str(speed) + "G"
+
+         speed_sup = switch.get("maxPortSpeed", "Unknown")
+         if speed_sup == 32:
+            speed_sup = "8,16,32_Gbps"
+         elif speed_sup == 16:
+            speed_sup = "4,8,16_Gbps"
+         elif speed_sup == 8:
+            speed_sup = "2,4,8_Gbps"
+
+         merged_entry = {
+            "SWITCH": switch.get("pSwitch", "Unknown"),
+            "P.IDX": switch.get("portIndex", "Unknown"),
+            "S/P": f"{switch.get('slotNumber', 'Unknown')}/{switch.get('portNumber', 'Unknown')}",
+            "SPEED": speed,
+            "SPEED_SUP": speed_sup,
+            "CTX": switch.get("virtualFabricId", "Unknown"),
+            "CTX_NAME": "None",
+            "PHY/NPIV": "NPIV" if switch.get("npiv", 0) == 1 else "Physical",
+            "STATE": switch.get("state", "Unknow"),
+            "STATUS": switch.get("status", "Unknow"),
+            "WWPN": "None",
+            "ALIAS": "None",
+            "ROLE": "None",
+            "ZONE": "None"
+         }
+         writer.writerow(merged_entry)
+
 # Esegui la generazione del CSV
 generate_csv()
+add_offline_ports()
 
 with open("/var/www/localhost/htdocs/result_json/output.csv", 'rb') as orig_file:
     with gzip.open("/var/www/localhost/htdocs/result_json/output.csv.gz", 'wb') as zipped_file:
