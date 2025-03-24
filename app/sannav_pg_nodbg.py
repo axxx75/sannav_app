@@ -198,143 +198,199 @@ def load_json(filename):
     with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
+
 def generate_csv():
     base_dir = "/var/www/localhost/htdocs/result_json/"
     device_file = os.path.join(base_dir, "device_port.json")
     switch_file = os.path.join(base_dir, "switch_port.json")
     output_file = os.path.join(base_dir, "output.csv")
 
-    # Caricamento dati JSON
     device_data = load_json(device_file)
     switch_data = load_json(switch_file)
 
-    with open(output_file, mode="w", newline="", encoding="utf-8") as csvfile:
+    with open(output_file, mode='w', newline='') as csvfile:
         fieldnames = [
-            "SWITCH", "VSWITCH", "P.IDX", "S/P", "SPEED", "SPEED_SUP",
-            "CTX", "CTX_NAME", "PHY/NPIV", "STATE", "STATUS", "WWPN", "ALIAS",
-            "ROLE", "ZONE"
+            "SWITCH", "VSWITCH", "P.IDX", "S/P", "SPEED", "SFP SUPP", "CTX", "CTX NAME",
+            "PHY/NPIV", "STATE", "STATUS", "WWPN", "ALIAS", "ROLE", "ZONE", "NOTE"
         ]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
 
-        # Creare un dizionario di mapping WWN → lista dispositivi
-        wwn_to_devices = {}
-        for d in device_data:
-            wwn = d.get("switchPortWwn", "")
-            if wwn:
-                if wwn not in wwn_to_devices:
-                    wwn_to_devices[wwn] = []
-                wwn_to_devices[wwn].append(d)
-
-        # Scrittura dei dati
+        # Prima passo sulle OFFLINE
         for port in switch_data:
-            switch_wwn = port.get("wwn", "")
-            devices = wwn_to_devices.get(switch_wwn, [])
-
-            if port.get("state") == "Offline":
-               wwpn = "No device connected"
-            else:
-               wwpn = port.get("wwn", "")
-
-            speed = str(port.get("speed", "Unknown"))
-            # Calcolo velocita'
+            if port.get("state") != "Offline":
+                continue
+            speed = port.get("speed", "Unknown")
             if port.get("speedNegotiated") == 1:
-                speed = "N" + speed
+               speed = "N" + str(speed)
             else:
-                speed = str(port.get("speed", "Unknown")) + "G"
+               speed = str(speed) + "G"
 
             speed_sup_map = {32: "8,16,32_Gbps", 16: "4,8,16_Gbps", 8: "2,4,8_Gbps"}
             speed_sup = speed_sup_map.get(port.get("maxPortSpeed"), "")
 
-            # Se ci sono piu'dispositivi NPIV sulla stessa porta
-            if devices:
+            row = {
+                "SWITCH": port.get("pSwitch"),
+                "VSWITCH": port.get("switchName"),
+                "P.IDX": port.get("portIndex"),
+                "S/P": f"{port.get('slotNumber')}/{port.get('portNumber')}",
+                "SPEED": speed,
+                "SFP SUPP": speed_sup,
+                "CTX": port.get("virtualFabricId"),
+                "CTX NAME": port.get("fabricName"),
+                "PHY/NPIV": "Physical",
+                "STATE": port.get("state"),
+                "STATUS": port.get("status"),
+                "WWPN": "None",
+                "ALIAS": "No_device_connected",
+                "ROLE": "None",
+                "ZONE": "None",
+                "NOTE": f"PortID: {port.get('portId')}"
+            }
+            writer.writerow(row)
 
-                for device in devices:
-                    if port.get("state") == "Offline":
-                       wwpn = "No device connected"
-                    else:
-                       wwpn = port.get("wwn", "")
+        # Ora passo sulle ONLINE - solo Physical
+        for port in switch_data:
+            if port.get("state") != "Online":
+                continue
 
-                    alias = device.get("zoneAlias", "")
-                    actzonec = device.get("activeZoneCount", 0)
-                    zone = "None"
+            switch_port_wwn = port.get("wwn")
+            switch_port_id = port.get("portId")
 
-                    if not alias:
-                        alias_f = device.get("deviceSymbolicName") or port.get("remoteDevice") or device.get("vendor", "Unknown")
-                        alias = f"No_Alias - {alias_f}"
-                    else:
-                        if actzonec == 0:
-                            alias += " (UnZ)"
-                            zone = "None"
-                        else:
-                            zone = device.get("activeZones", "")
+            matching_device = None
+            for device in device_data:
+                if (device.get("portId") == switch_port_id and
+                    device.get("switchPortWwn") == switch_port_wwn):
+                    matching_device = device
+                    break
 
-                    # Controllo NPIV
-                    phy_npiv = "Physical"
-                    if port.get("npiv") == 1:
-                        port_id = str(device.get("portId", ""))
-                        if port_id.endswith("0"):
-                            phy_npiv = "Physical"
-                        else:
-                            phy_npiv = "NPIV"
+            alias = "None"
+            zone = "None"
+            role = "None"
+            wwpn = switch_port_wwn if switch_port_wwn else "None"
 
-                    # Scrittura riga CSV
-                    writer.writerow({
-                        "SWITCH": port.get("pSwitch", ""),
-                        "VSWITCH": port.get("switchName", ""),
-                        "P.IDX": port.get("portIndex", ""),
-                        "S/P": f"{port.get('slotNumber', '')}/{port.get('portNumber', '')}",
-                        "SPEED": speed,
-                        "SPEED_SUP": speed_sup,
-                        "CTX": port.get("virtualFabricId", ""),
-                        "CTX_NAME": port.get("fabricName", ""),
-                        "PHY/NPIV": phy_npiv,
-                        "STATE": port.get("state", ""),
-                        "STATUS": port.get("status", ""),
-                        "WWPN": wwpn,
-                        "ALIAS": alias,
-                        "ROLE": device.get("portRole", ""),
-                        "ZONE": zone,
-                    })
-            else:
-                alias = port.get("remoteDevice", "")  # Proviamo a prendere un alias
-                alias = f"No_Alias - {alias}"
+            if matching_device:
+                wwpn = matching_device.get("wwn", switch_port_wwn)
+                actzonec = matching_device.get("activeZoneCount")
+                alias = matching_device.get("zoneAlias", "")
+                zone = "None"
+
+                speed = port.get("speed", "Unknown")
+                if port.get("speedNegotiated") == 1:
+                   speed = "N" + str(speed)
+                else:
+                   speed = str(speed) + "G"
+
+                speed_sup_map = {32: "8,16,32_Gbps", 16: "4,8,16_Gbps", 8: "2,4,8_Gbps"}
+                speed_sup = speed_sup_map.get(port.get("maxPortSpeed"), "")
+
                 if not alias:
-                   alias = port.get("vendor", "Unknown")  # Se non c'e' usiamo il vendor
-                   alias = f"No_Alias - {alias}"
+                    alias_f = matching_device.get("deviceSymbolicName") or port.get("remoteDevice") or matching_device.get("vendor")
+                    alias = f"No_Alias - {alias_f}"
+                else:
+                    if actzonec is None or actzonec == 0:
+                        alias += " (UnZ)"
+                        zone = "None"
+                    else:
+                        zone = matching_device.get("activeZones", "")
 
-                # Scrive comunque la riga anche se non ci sono NPIV
-                writer.writerow({
-                    "SWITCH": port.get("pSwitch", ""),
-                    "VSWITCH": port.get("switchName", ""),
-                    "P.IDX": port.get("portIndex", ""),
-                    "S/P": f"{port.get('slotNumber', '')}/{port.get('portNumber', '')}",
-                    "SPEED": speed,
-                    "SPEED_SUP": speed_sup,
-                    "CTX": port.get("virtualFabricId", ""),
-                    "CTX_NAME": port.get("fabricName", ""),
-                    "PHY/NPIV": "Physical",
-                    "STATE": port.get("state", ""),
-                    "STATUS": port.get("status", ""),
-                    "WWPN": wwpn,
-                    "ALIAS": alias,
-                    #"ROLE": "None",
-                    "ROLE": wwn_to_devices.get("portRole", "None"),
-                    "ZONE": "None",
-                })
+                role = matching_device.get("portRole", "None")
+            else:
+                alias = f"No_Alias - {port.get('remoteDevice')}"
+                zone = "None"
+                role = "Switch"
+                wwpn = port.get("remoteNodeWwn")
 
+            note = f"PortID: {port.get('portId')}"
+            if port.get("state") == "Online" and not switch_port_wwn:
+                note += " | WARNING: Porta online senza device"
 
+            # Scrivo la riga della PHYSICAL
+            row = {
+                "SWITCH": port.get("pSwitch"),
+                "VSWITCH": port.get("switchName"),
+                "P.IDX": port.get("portIndex"),
+                "S/P": f"{port.get('slotNumber')}/{port.get('portNumber')}",
+                "SPEED": speed,
+                "SFP SUPP": speed_sup,
+                "CTX": port.get("virtualFabricId"),
+                "CTX NAME": port.get("fabricName"),
+                "PHY/NPIV": "Physical",
+                "STATE": port.get("state"),
+                "STATUS": port.get("status"),
+                "WWPN": wwpn,
+                "ALIAS": alias,
+                "ROLE": role,
+                "ZONE": zone,
+                "NOTE": note
+            }
+            writer.writerow(row)
+
+            # --------------------------
+            # CERCO eventuali NPIV legati
+            # --------------------------
+            port_id_prefix = str(switch_port_id)[:4]
+            for device in device_data:
+                dev_port_id = str(device.get("portId"))
+                # Escludo la porta fisica gia' scritta (match completo a 6 cifre)
+                if dev_port_id == str(switch_port_id):
+                   continue
+                # Cerco solo NPIV con stesso prefisso e stesso switchPortWwn
+                if dev_port_id.startswith(port_id_prefix) and device.get("switchPortWwn") == switch_port_wwn:
+                # Scrivo la riga NPIV trovata
+
+                   alias = device.get("zoneAlias", "")
+                   zone = "None"
+                   role = device.get("portRole", "None")
+
+                   speed = port.get("speed", "Unknown")
+                   if port.get("speedNegotiated") == 1:
+                      speed = "N" + str(speed)
+                   else:
+                      speed = str(speed) + "G"
+
+                   speed_sup_map = {32: "8,16,32_Gbps", 16: "4,8,16_Gbps", 8: "2,4,8_Gbps"}
+                   speed_sup = speed_sup_map.get(port.get("maxPortSpeed"), "")
+
+                   actzonec = device.get("activeZoneCount")
+                   if not alias:
+                       alias_f = device.get("deviceSymbolicName") or device.get("vendor")
+                       alias = f"No_Alias - {alias_f}"
+                   else:
+                       if not actzonec:
+                           alias += " (UnZ)"
+                       else:
+                           zone = device.get("activeZones", "")
+                   npiv_row = {
+                        "SWITCH": port.get("pSwitch"),
+                        "VSWITCH": port.get("switchName"),
+                        "P.IDX": port.get("portIndex"),
+                        "S/P": f"{port.get('slotNumber')}/{port.get('portNumber')}",
+                        "SPEED": speed,
+                        "SFP SUPP": speed_sup,
+                        "CTX": port.get("virtualFabricId"),
+                        "CTX NAME": port.get("fabricName"),
+                        "PHY/NPIV": "NPIV",
+                        "STATE": port.get("state"),
+                        "STATUS": port.get("status"),
+                        "WWPN": device.get("wwn", "None"),
+                        "ALIAS": alias,
+                        "ROLE": device.get("portRole", "None"),
+                        "ZONE": zone,
+                        "NOTE": f"NPIV matched by prefix on PortID {port.get('portId')}"
+                   }
+                   writer.writerow(npiv_row)
+
+    print("CSV generato con successo!")
 
 # Esegui la generazione del CSV
 generate_csv()
-
 # Compressione del CSV in Gzip
-csv_path = "/var/www/localhost/htdocs/result_json/output.csv"
-gzip_path = csv_path + ".gz"
 
-with open(csv_path, 'rb') as orig_file:
-    with gzip.open(gzip_path, 'wb') as zipped_file:
+# Gzippo file per download più rapidio
+with open("/var/www/localhost/htdocs/result_json/output.csv", 'rb') as orig_file:
+    with gzip.open("/var/www/localhost/htdocs/result_json/output.csv.gz", 'wb') as zipped_file:
         zipped_file.writelines(orig_file)
 
-print(f"File generato: {csv_path}")
-print(f"File compresso: {gzip_path}")
+print(f"File generato: {orig_file}")
+print(f"File compresso: {zipped_file}")
