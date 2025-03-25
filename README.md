@@ -125,8 +125,8 @@ CONTAINER ID        IMAGE               COMMAND               CREATED           
 d00a70f2b7a5        sannav_app     "/usr/bin/supervisor…"   2 minutes ago       Up 2 minutes        0.0.0.0:81->81/tcp, [::]:81->81/tcp    sannav_app
 ```
 
-
 ## Reference
 
 - [Docker file reference](https://docs.docker.com/reference/dockerfile/)
 - [Docker CLI reference](https://docs.docker.com/reference/cli/docker/)
+- [Brocade: Sannav Management Portal REST API and Northbound Streaming Reference Manual 2.4.0x](https://techdocs.broadcom.com/content/dam/broadcom/techdocs/us/en/pdf/fc-networking/software-sannav/sannav-240x-restapi.pdf)
