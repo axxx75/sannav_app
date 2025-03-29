@@ -6,6 +6,8 @@ import os
 import datetime
 import csv
 import gzip
+from collections import defaultdict
+
 ip_sannav = "XXXX"
 username = "XXXX"
 password = "XXXX"
@@ -188,19 +190,18 @@ def save_switch_ports_report(ip_sannav, sannav_key):
 
 
 ### ---
-sannav_key = sannav_login(ip_sannav, username, password)
+#sannav_key = sannav_login(ip_sannav, username, password)
 
-save_device_ports_report(ip_sannav, sannav_key)
-save_switch_ports_report(ip_sannav, sannav_key)
-sannav_logout(sannav_key,ip_sannav)
+#save_device_ports_report(ip_sannav, sannav_key)
+#save_switch_ports_report(ip_sannav, sannav_key)
+#sannav_logout(sannav_key,ip_sannav)
 
 def load_json(filename):
     with open(filename, "r", encoding="utf-8") as f:
         return json.load(f)
 
-
 def generate_csv():
-    base_dir = "/var/www/localhost/htdocs/result_json/"
+    base_dir = "/app/result_json/"
     device_file = os.path.join(base_dir, "device_port.json")
     switch_file = os.path.join(base_dir, "switch_port.json")
     output_file = os.path.join(base_dir, "output.csv")
@@ -392,8 +393,10 @@ def generate_csv():
 
 # Esegui la generazione del CSV
 generate_csv()
+
 # Gzippo file per download più rapidio
-with open("/var/www/localhost/htdocs/result_json/output.csv", 'rb') as orig_file:
-    with gzip.open("/var/www/localhost/htdocs/result_json/output.csv.gz", 'wb') as zipped_file:
+with open ("/app/result_json/output.csv", 'rb') as orig_file:
+    with gzip.open("/app/result_json/output.csv.gz", 'wb') as zipped_file:
         zipped_file.writelines(orig_file)
+
 print(f"File compresso: {zipped_file}")
