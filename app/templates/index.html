@@ -35,15 +35,25 @@
 
    <div class="container mt-4">
       <button class="column-settings-btn">⚙️ Impostazioni colonne</button>
-      <h1 class="display-3 font-weight-bold text-primary" align=center>All Ports</h1>
+
+      <div class="text-center" style="overflow: hidden; width: 100%;">
+         <h1 class="display-3 font-weight-bold text-primary rounded shadow-sm shadow d-inline-block"
+            style="transition: 0.3s; cursor: pointer; transform-origin: center; text-shadow: 0 0 10px rgba(0,123,255,0.8);"
+            onmouseover="this.style.color='#007bff'; this.style.transform='scale(1.05)';"
+            onmouseout="this.style.color=''; this.style.transform='scale(1)';">
+            🌐 All Ports 🌐
+         </h1>
+      </div>
+
       <div class="update-time text-left">
          <strong>Last update:</strong>
          <span id="last-update">Caricamento...</span>
       </div>
+	  
       <div id="columnToggleMenu" class="column-toggle-menu"></div>
-      <div class="table-container">
-         <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
-            <thead>
+         <div class="table-container">
+            <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
+               <thead>
                <tr>
                   <th>ID</th>
                   <th>SWITCH</th>
@@ -111,21 +121,21 @@
          let table = $('#dataTable').DataTable({
             dom: '<"top d-flex justify-content-between align-items-center"lB>rt<"bottom d-flex justify-content-between align-items-center"ip>',
             buttons: [
-                {
-                    extend: 'csv',
-                    text: '📄 CSV',
-                    className: 'btn btn-primary btn-sm',
-                    action: function(e, dt, node, config) {
-                        exportFilteredData('csv');
-                    }
+               {
+                  extend: 'csv',
+                  text: '📄 CSV',
+                  className: 'btn btn-primary btn-sm',
+                  action: function(e, dt, node, config) {
+                     exportFilteredData('csv');
+                  }
                 },
                 {
-                    extend: 'excel',
-                    text: '📊 Excel',
-                    className: 'btn btn-primary btn-sm',
-                    action: function(e, dt, node, config) {
-                        exportFilteredData('excel');
-                    }
+                  extend: 'excel',
+                  text: '📊 Excel',
+                  className: 'btn btn-primary btn-sm',
+                  action: function(e, dt, node, config) {
+                     exportFilteredData('excel');
+                  }
                 }
             ],
 
