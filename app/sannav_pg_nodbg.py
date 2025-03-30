@@ -1,11 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import requests
-import json
-import os
-import datetime
-import csv
-import gzip
+import requests, json, os, datetime, csv, gzip, subprocess
 from collections import defaultdict
 from dotenv import load_dotenv
 
@@ -402,3 +397,7 @@ with open ("/app/result_json/output.csv", 'rb') as orig_file:
         zipped_file.writelines(orig_file)
 
 print(f"File compresso: {zipped_file}")
+
+# Update DB
+result = subprocess.run(["python", "/app/update_db.py"], capture_output=True, text=True)
+print(result.stdout)  # Stampa l'output dello script eseguito
