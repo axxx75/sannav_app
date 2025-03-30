@@ -165,3 +165,6 @@ See all changes to this project in the [CHANGELOG.md](CHANGELOG.md) file.
 - [Docker CLI reference](https://docs.docker.com/reference/cli/docker/)
 - [Brocade: Sannav Management Portal REST API and Northbound Streaming Reference Manual 2.4.0x](https://techdocs.broadcom.com/content/dam/broadcom/techdocs/us/en/pdf/fc-networking/software-sannav/sannav-240x-restapi.pdf)
 - [Brocade® SANnav™ Management Portal User Guide, 2.3.x](https://techdocs.broadcom.com/content/dam/broadcom/techdocs/us/en/pdf/fc-networking/software-sannav/sannav-23x-mp.pdf)
+- [Datatable Reference](https://datatables.net/reference/index)
+- [Bootstrap](https://getbootstrap.com/docs/4.6/getting-started/introduction/)
+- [SQlite](https://www.sqlite.org/doclist.html)
