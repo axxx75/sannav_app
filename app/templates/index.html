@@ -176,6 +176,10 @@
             column.visible(!column.visible());
          });
 
+         $('.column-search').on('click', function(event) {
+             event.stopPropagation();
+         });
+
          $('.column-settings-btn').click(function(event) {
             populateColumnToggleMenu();
             menu.toggle();
