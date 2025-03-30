@@ -134,7 +134,7 @@ Now that you have an image, you can run the application in a container using the
    
    You should see your SANnav App.
 
-   ![anteprima webpage](images/anteprima_webpage.png)
+   ![anteprima webpage](images/preview.png)
 
 At this point, you have a running a flask server with a sqlite for data that expose the webpage with the result of the RESTApi query to SANnav.
 
