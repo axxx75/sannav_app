@@ -29,6 +29,7 @@ COPY httpd.conf /etc/apache2/httpd.conf
 
 # Copia le web page nel document root di Apache (di default in Alpine è /var/www/localhost/htdocs/)
 ADD app/ /app
+ADD page/ /var/www/localhost/htdocs
 RUN ln -s /app/sannav_pg_nodbg.py /app/sannav_pg.py
 
 # Espone la porta: 80 per Apache e la 5001 per Flask
