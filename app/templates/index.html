@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="All FC Ports" content="width=device-width, initial-scale=1.0">
+    <title>All Ports</title>
+    <link rel="icon" href="favicon.ico" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="static/css/bootstrap.min.css">
+    <link rel="stylesheet" href="static/css/dataTables.bootstrap4.min.css">
+
+    <!-- CSS DataTables Buttons -->
+    <link rel="stylesheet" type="text/css" href="static/css/buttons.dataTables.min.css">
+
+    <!-- CSS Custom -->
+    <link rel="stylesheet" href="static/css/style.css">
+</head>
+<body>
+   <div class="container mt-4">
+      <button class="column-settings-btn">⚙️ Impostazioni colonne</button>
+      <h1 class="display-3 font-weight-bold text-primary" align=center>All Ports</h1>
+      <div id="columnToggleMenu" class="column-toggle-menu"></div>
+      <div class="table-container">
+         <table id="dataTable" class="table table-striped table-bordered">
+            <thead>
+               <tr>
+                  <th>ID</th>
+                  <th>SWITCH</th>
+                  <th>VSWITCH</th>
+                  <th>P.IDX</th>
+                  <th>S/P</th>
+                  <th>SPEED</th>
+                  <th>SPEED_SUP</th>
+                  <th>CTX</th>
+                  <th>CTX_NAME</th>
+                  <th>PHY/NPIV</th>
+                  <th>STATE</th>
+                  <th>STATUS</th>
+                  <th>WWPN</th>
+                  <th>ALIAS</th>
+                  <th>ROLE</th>
+                  <th>ZONE</th>
+                  <th>NOTE</th>
+               </tr>
+               <tr>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+                  <th><input type="text" class="column-search" placeholder="🔍"></th>
+               </tr>
+            </thead>
+         </table>
+      </div>
+   </div>
+
+   <!-- jQuery e DataTables -->
+   <script src="static/js/jquery-3.6.0.min.js"></script>
+   <script src="static/js/jquery.dataTables.min.js"></script>
+   <script src="static/js/dataTables.bootstrap4.min.js"></script>
+   <script src="static/js/dataTables.buttons.min.js"></script>
+   <script src="static/js/buttons.colVis.min.js"></script>
+   <script src="static/js/buttons.html5.min.js"></script>
+   <script src="static/js/jszip.min.js"></script>
+   <script src="static/js/vfs_fonts.js"></script>
+
+   <script>
+      $(document).ready(function() {
+        let table = $('#dataTable').DataTable({
+            dom: '<"top d-flex justify-content-between align-items-center"lfB>rt<"bottom d-flex justify-content-between align-items-center"ip>',
+            buttons: [
+                { extend: 'csv', text: '📄 CSV', className: 'btn btn-primary btn-sm' },
+                { extend: 'excel', text: '📊 Excel', className: 'btn btn-primary btn-sm' }
+            ],
+            "processing": true,
+            "serverSide": true,
+            "ajax": "/data",
+            "searching": true,
+            "pageLength": 50,
+            "lengthMenu": [10, 25, 50, 100, 500],
+            "autoWidth": false,
+            "deferRender": true,
+            "scroller": true,
+            "scrollCollapse": true,
+            "scrollX": false,
+            "columns": [{"data": "id"}, {"data": "switch"}, {"data": "vswitch"}, {"data": "pidx"}, {"data": "sp"}, {"data": "speed"}, {"data": "speed_sup"}, {"data": "ctx"}, {"data": "ctx_name"}, {"data": "pn"}, {"data": "state"}, {"data": "status"}, {"data": "wwpn"}, {"data": "alias"}, {"data": "role"}, {"data": "zone", "visible": false}, {"data": "note", "visible": false}]
+        });
+
+        $('.column-search').on('input', function () {
+            let columnIndex = $(this).parent().index();
+            table.column(columnIndex).search(this.value).draw();
+        });
+
+        let menu = $("#columnToggleMenu");
+        let settingsButton = $(".column-settings-btn");
+
+        // Funzione per aggiornare il menu con i checkbox
+        function populateColumnToggleMenu() {
+            menu.empty();
+            table.columns().every(function(index) {
+                let column = this;
+                let columnName = $('#dataTable thead th').eq(index).text();
+                let checked = column.visible() ? "checked" : "";
+
+                let checkbox = `
+                    <label>
+                        <input type="checkbox" class="toggle-column" data-column="${index}" ${checked}>
+                        ${columnName}
+                    </label>
+                `;
+                menu.append(checkbox);
+            });
+        }
+
+        // Mostra/Nasconde il menu al click del pulsante impostazioni
+        settingsButton.click(function(event) {
+            populateColumnToggleMenu();
+            let buttonOffset = settingsButton.offset();
+            menu.css({
+                top: buttonOffset.top + settingsButton.outerHeight() + 5,
+                left: buttonOffset.left
+            }).toggle();
+            event.stopPropagation();
+        });
+
+        // Nasconde il menu se si clicca fuori
+        $(document).click(function(event) {
+            if (!$(event.target).closest('.column-settings-btn, .column-toggle-menu').length) {
+                menu.hide();
+            }
+        });
+
+        // Toggle colonne e aggiorna il pulsante
+        $(document).on("change", ".toggle-column", function() {
+            let column = table.column($(this).data("column"));
+            column.visible(!column.visible());
+        });
+      });
+
+   </script>
+</body>
+</html>

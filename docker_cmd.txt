@@ -1,0 +1,2 @@
+docker build -t sannav_all .
+docker run --name sannav_all --replace --restart=always -d -p 81:81 -p 5001:5001 -v sannav_bk:/mnt/bk sannav_all_y
