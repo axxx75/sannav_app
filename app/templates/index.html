@@ -22,7 +22,7 @@
       <h1 class="display-3 font-weight-bold text-primary" align=center>All Ports</h1>
       <div id="columnToggleMenu" class="column-toggle-menu"></div>
       <div class="table-container">
-         <table id="dataTable" class="table table-striped table-bordered">
+         <table id="dataTable" class="table table-striped table-bordered"  style="width:100%">
             <thead>
                <tr>
                   <th>ID</th>
@@ -79,7 +79,16 @@
 
    <script>
       $(document).ready(function() {
-        let table = $('#dataTable').DataTable({
+         let columnsConfig = [
+            {data: "id", title: "ID"}, {data: "switch", title: "SWITCH"}, {data: "vswitch", title: "VSWITCH"},
+            {data: "pidx", title: "P.IDX"}, {data: "sp", title: "S/P"}, {data: "speed", title: "SPEED"},
+            {data: "speed_sup", title: "SPEED_SUP"}, {data: "ctx", title: "CTX"}, {data: "ctx_name", title: "CTX_NAME"},
+            {data: "pn", title: "PHY/NPIV"}, {data: "state", title: "STATE"}, {data: "status", title: "STATUS"},
+            {data: "wwpn", title: "WWPN"}, {data: "alias", title: "ALIAS"}, {data: "role", title: "ROLE"},
+            {data: "zone", title: "ZONE", visible: false}, {data: "note", title: "NOTE", visible: false}
+         ];
+
+         let table = $('#dataTable').DataTable({
             dom: '<"top d-flex justify-content-between align-items-center"lfB>rt<"bottom d-flex justify-content-between align-items-center"ip>',
             buttons: [
                 { extend: 'csv', text: '📄 CSV', className: 'btn btn-primary btn-sm' },
@@ -97,57 +106,42 @@
             "scrollCollapse": true,
             "scrollX": false,
             "columns": [{"data": "id"}, {"data": "switch"}, {"data": "vswitch"}, {"data": "pidx"}, {"data": "sp"}, {"data": "speed"}, {"data": "speed_sup"}, {"data": "ctx"}, {"data": "ctx_name"}, {"data": "pn"}, {"data": "state"}, {"data": "status"}, {"data": "wwpn"}, {"data": "alias"}, {"data": "role"}, {"data": "zone", "visible": false}, {"data": "note", "visible": false}]
-        });
+         });
 
-        $('.column-search').on('input', function () {
-            let columnIndex = $(this).parent().index();
-            table.column(columnIndex).search(this.value).draw();
-        });
+         $('.column-search').on('input', function () {
+             let columnIndex = $(this).parent().index();
+             table.column(columnIndex).search(this.value).draw();
+         });
 
-        let menu = $("#columnToggleMenu");
-        let settingsButton = $(".column-settings-btn");
+         let menu = $("#columnToggleMenu");
+         let settingsButton = $(".column-settings-btn");
 
-        // Funzione per aggiornare il menu con i checkbox
-        function populateColumnToggleMenu() {
-            menu.empty();
-            table.columns().every(function(index) {
-                let column = this;
-                let columnName = $('#dataTable thead th').eq(index).text();
-                let checked = column.visible() ? "checked" : "";
-
-                let checkbox = `
-                    <label>
-                        <input type="checkbox" class="toggle-column" data-column="${index}" ${checked}>
-                        ${columnName}
-                    </label>
-                `;
+         // Funzione per aggiornare il menu con i checkbox
+         function populateColumnToggleMenu() {
+             menu.empty();
+             columnsConfig.forEach((col, index) => {
+                let checked = table.column(index).visible() ? "checked" : "";
+                let checkbox = `<label><input type="checkbox" class="toggle-column" data-column="${index}" ${checked}> ${col.title}</label>`;
                 menu.append(checkbox);
-            });
-        }
+             });
+         }
 
-        // Mostra/Nasconde il menu al click del pulsante impostazioni
-        settingsButton.click(function(event) {
+         $(document).on("change", ".toggle-column", function() {
+            let column = table.column($(this).data("column"));
+            column.visible(!column.visible());
+         });
+
+         $('.column-settings-btn').click(function(event) {
             populateColumnToggleMenu();
-            let buttonOffset = settingsButton.offset();
-            menu.css({
-                top: buttonOffset.top + settingsButton.outerHeight() + 5,
-                left: buttonOffset.left
-            }).toggle();
+            menu.toggle();
             event.stopPropagation();
-        });
+         });
 
-        // Nasconde il menu se si clicca fuori
-        $(document).click(function(event) {
+         $(document).click(function(event) {
             if (!$(event.target).closest('.column-settings-btn, .column-toggle-menu').length) {
                 menu.hide();
             }
-        });
-
-        // Toggle colonne e aggiorna il pulsante
-        $(document).on("change", ".toggle-column", function() {
-            let column = table.column($(this).data("column"));
-            column.visible(!column.visible());
-        });
+         });
       });
 
    </script>
