@@ -17,9 +17,27 @@
     <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
+   <!-- Sezione Ultimo aggiornamento -->
+   <script>
+       async function fetchLastUpdate() {
+           try {
+               const response = await fetch("/api/last-update");
+               const data = await response.json();
+               document.getElementById("last-update").innerText = data.last_update;
+           } catch (error) {
+               document.getElementById("last-update").innerText = "Errore nel caricamento.";
+           }
+       }
+       fetchLastUpdate();
+   </script>
+
    <div class="container mt-4">
       <button class="column-settings-btn">⚙️ Impostazioni colonne</button>
       <h1 class="display-3 font-weight-bold text-primary" align=center>All Ports</h1>
+      <div class="update-time text-left">
+         <strong>Ultimo aggiornamento:</strong>
+         <span id="last-update">Caricamento...</span>
+      </div>
       <div id="columnToggleMenu" class="column-toggle-menu"></div>
       <div class="table-container">
          <table id="dataTable" class="table table-striped table-bordered"  style="width:100%">

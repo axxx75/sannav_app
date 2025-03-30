@@ -1,8 +1,20 @@
 from flask import Flask, jsonify, render_template, request
+from datetime import datetime
+
 import sqlite3
+import os
 
 app = Flask(__name__)
 DB_PATH = "/app/result_json/data.sqlite"
+CSV_PATH = "/app/result_json/output.csv"
+
+def get_last_update():
+    try:
+        timestamp = os.path.getmtime(CSV_PATH)
+        return datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")
+    except FileNotFoundError:
+        return "N/A"
+
 
 def get_db_connection():
     """Crea una connessione al database SQLite e imposta il factory dei risultati."""
@@ -16,8 +28,12 @@ def get_db_connection():
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    last_update = get_last_update()
+    return render_template("index.html", last_update=last_update)
 
+@app.route("/api/last-update")
+def last_update():
+    return jsonify({"last_update": get_last_update()})
 
 @app.route('/data', methods=['GET'])
 def get_data():
@@ -69,7 +85,6 @@ def get_data():
     conn.close()
 
     data = [dict(row) for row in rows]
-
     return jsonify({
         "draw": draw,
         "recordsTotal": total_records,   # ✅ Numero totale di record nel database
@@ -78,11 +93,5 @@ def get_data():
     })
 
 
-
-
-
-
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)
-
-
