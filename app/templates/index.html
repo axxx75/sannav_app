@@ -18,18 +18,20 @@
 </head>
 <body>
    <!-- Sezione Ultimo aggiornamento -->
-   <script>
-       async function fetchLastUpdate() {
-           try {
-               const response = await fetch("/api/last-update");
-               const data = await response.json();
-               document.getElementById("last-update").innerText = data.last_update;
-           } catch (error) {
-               document.getElementById("last-update").innerText = "Errore nel caricamento.";
-           }
-       }
-       fetchLastUpdate();
-   </script>
+<script>
+    async function fetchLastUpdate() {
+        try {
+            const response = await fetch("/api/last-update");
+            const data = await response.json();
+            document.getElementById("last-update").innerText = data.last_update;
+        } catch (error) {
+            document.getElementById("last-update").innerText = "Errore nel caricamento.";
+        }
+    }
+
+    // Chiama la funzione al caricamento della pagina
+    fetchLastUpdate();
+</script>
 
    <div class="container mt-4">
       <button class="column-settings-btn">⚙️ Impostazioni colonne</button>
@@ -143,7 +145,7 @@
                 menu.append(checkbox);
              });
          }
-
+ 
          $(document).on("change", ".toggle-column", function() {
             let column = table.column($(this).data("column"));
             column.visible(!column.visible());
