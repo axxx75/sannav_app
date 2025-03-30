@@ -12,7 +12,7 @@
             justify-content: center;
             align-items: center;
             height: 100vh;
-            background: linear-gradient(135deg, #ffff00, #ffffff);  /* Gradiente Blu -> Viola */
+            background: linear-gradient(135deg, #ffff00, #ffffff);
         }
         .redirect-box {
             text-align: center;
