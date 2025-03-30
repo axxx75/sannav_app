@@ -1,48 +1,48 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-    <meta charset="UTF-8">
-    <meta name="All FC Ports" content="width=device-width, initial-scale=1.0">
-    <title>All Ports</title>
-    <link rel="icon" href="favicon.ico" />
+   <meta charset="UTF-8">
+   <meta name="All FC Ports" content="width=device-width, initial-scale=1.0">
+   <title>All Ports</title>
+   <link rel="icon" href="favicon.ico" />
 
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="static/css/bootstrap.min.css">
-    <link rel="stylesheet" href="static/css/dataTables.bootstrap4.min.css">
+   <!-- Bootstrap CSS -->
+   <link rel="stylesheet" href="static/css/bootstrap.min.css">
+   <link rel="stylesheet" href="static/css/dataTables.bootstrap4.min.css">
 
-    <!-- CSS DataTables Buttons -->
-    <link rel="stylesheet" type="text/css" href="static/css/buttons.dataTables.min.css">
+   <!-- CSS DataTables Buttons -->
+   <link rel="stylesheet" type="text/css" href="static/css/buttons.dataTables.min.css">
 
-    <!-- CSS Custom -->
-    <link rel="stylesheet" href="static/css/style.css">
+   <!-- CSS Custom -->
+   <link rel="stylesheet" href="static/css/style.css">
 </head>
 <body>
    <!-- Sezione Ultimo aggiornamento -->
-<script>
-    async function fetchLastUpdate() {
-        try {
+   <script>
+      async function fetchLastUpdate() {
+         try {
             const response = await fetch("/api/last-update");
             const data = await response.json();
             document.getElementById("last-update").innerText = data.last_update;
-        } catch (error) {
+         } catch (error) {
             document.getElementById("last-update").innerText = "Errore nel caricamento.";
-        }
-    }
+         }
+      }
 
-    // Chiama la funzione al caricamento della pagina
-    fetchLastUpdate();
-</script>
+      // Chiama la funzione al caricamento della pagina
+      fetchLastUpdate();
+   </script>
 
    <div class="container mt-4">
       <button class="column-settings-btn">⚙️ Impostazioni colonne</button>
       <h1 class="display-3 font-weight-bold text-primary" align=center>All Ports</h1>
       <div class="update-time text-left">
-         <strong>Ultimo aggiornamento:</strong>
+         <strong>Last update:</strong>
          <span id="last-update">Caricamento...</span>
       </div>
       <div id="columnToggleMenu" class="column-toggle-menu"></div>
       <div class="table-container">
-         <table id="dataTable" class="table table-striped table-bordered"  style="width:100%">
+         <table id="dataTable" class="table table-striped table-bordered" style="width:100%">
             <thead>
                <tr>
                   <th>ID</th>
@@ -109,7 +109,7 @@
          ];
 
          let table = $('#dataTable').DataTable({
-            dom: '<"top d-flex justify-content-between align-items-center"lfB>rt<"bottom d-flex justify-content-between align-items-center"ip>',
+            dom: '<"top d-flex justify-content-between align-items-center"lB>rt<"bottom d-flex justify-content-between align-items-center"ip>',
             buttons: [
                 { extend: 'csv', text: '📄 CSV', className: 'btn btn-primary btn-sm' },
                 { extend: 'excel', text: '📊 Excel', className: 'btn btn-primary btn-sm' }
@@ -125,7 +125,8 @@
             "scroller": true,
             "scrollCollapse": true,
             "scrollX": false,
-            "columns": [{"data": "id"}, {"data": "switch"}, {"data": "vswitch"}, {"data": "pidx"}, {"data": "sp"}, {"data": "speed"}, {"data": "speed_sup"}, {"data": "ctx"}, {"data": "ctx_name"}, {"data": "pn"}, {"data": "state"}, {"data": "status"}, {"data": "wwpn"}, {"data": "alias"}, {"data": "role"}, {"data": "zone", "visible": false}, {"data": "note", "visible": false}]
+            "columns": [{"data": "id"}, {"data": "switch"}, {"data": "vswitch"}, {"data": "pidx"}, {"data": "sp"}, {"data": "speed"}, {"data": "speed_sup"}, {"data": "ctx"}, {"data": "ctx_name"}, {"data": "pn"}, {"data": "state"}, {"data": "status"}, {"data": "wwpn"}, {"data": "alias"}, {"data": "role"}, {"data": "zone", "visible": false}, {"data": "note", "visible": false}],
+            "order": [[0, "asc"]]
          });
 
          $('.column-search').on('input', function () {
@@ -145,7 +146,7 @@
                 menu.append(checkbox);
              });
          }
- 
+
          $(document).on("change", ".toggle-column", function() {
             let column = table.column($(this).data("column"));
             column.visible(!column.visible());
