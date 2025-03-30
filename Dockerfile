@@ -43,10 +43,6 @@ RUN echo '10  *  *  *  * python /app/output_bk.py ' >> /etc/crontabs/root
 # Eseguo la Discovery San per partire con dati nuovi e aggiornati
 RUN /usr/bin/python -Wi  /app/sannav_pg.py
 
-# Inizializzo Sqlite e carico il primo csv
-RUN /usr/bin/python -Wi  /app/init_db.py
-RUN /usr/bin/python -Wi  /app/carica_dati.py
-
 # Copia il file di configurazione per Supervisor
 COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
