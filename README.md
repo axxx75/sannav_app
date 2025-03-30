@@ -168,3 +168,4 @@ See all changes to this project in the [CHANGELOG.md](CHANGELOG.md) file.
 - [Datatable Reference](https://datatables.net/reference/index)
 - [Bootstrap](https://getbootstrap.com/docs/4.6/getting-started/introduction/)
 - [SQlite](https://www.sqlite.org/doclist.html)
+- [Flask Documentation](https://flask.palletsprojects.com/en/stable/#user-s-guide)
