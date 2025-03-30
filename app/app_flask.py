@@ -13,7 +13,7 @@ def get_db_connection():
         conn.row_factory = sqlite3.Row  # Risultati come dizionari
         return conn
     except sqlite3.Error as e:
-        print("Errore di connessione:", e)
+        print("❌ Errore di connessione:", e)
         return None
 
 @app.route('/')
@@ -22,9 +22,10 @@ def index():
     return render_template("index.html", last_update=last_update)
 
 def get_last_update():
+    """Restituisce la data di ultima modifica del file CSV."""
     if os.path.exists(CSV_PATH):
-        timestamp = os.path.getmtime(CSV_PATH)  # Ottiene il timestamp di modifica
-        return datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")  # Formatta la data
+        timestamp = os.path.getmtime(CSV_PATH)
+        return datetime.fromtimestamp(timestamp).strftime("%d-%m-%Y %H:%M:%S")
     return "Il file non esiste."
 
 @app.route("/api/last-update")
@@ -45,13 +46,12 @@ def get_data():
 
     print("🟢 Parametri ricevuti:", request.args)  # DEBUG
 
-    base_query = """
-        FROM dati
-        WHERE 1=1
-    """
-    params = []
+    columns = ["id", "switch", "vswitch", "pidx", "sp", "speed", "speed_sup", "ctx", 
+               "ctx_name", "pn", "state", "status", "wwpn", "alias", "role", "zone", "note"]
 
-    columns = ["id", "switch", "vswitch", "pidx", "sp", "speed", "speed_sup", "ctx", "ctx_name", "pn", "state", "status", "wwpn", "alias", "role", "zone", "note"]
+    # **Gestione della ricerca avanzata**
+    base_query = "FROM dati WHERE 1=1"
+    params = []
 
     for i, col in enumerate(columns):
         search_value = request.args.get(f'columns[{i}][search][value]', '')
@@ -59,6 +59,13 @@ def get_data():
         if search_value:
             base_query += f" AND {col} LIKE ?"
             params.append(f"%{search_value}%")
+
+    # **Gestione dell'ordinamento**
+    order_column_index = request.args.get('order[0][column]', type=int, default=0)
+    order_dir = request.args.get('order[0][dir]', default='asc')
+
+    order_column = columns[order_column_index] if 0 <= order_column_index < len(columns) else "id"
+    order_direction = "ASC" if order_dir == "asc" else "DESC"
 
     # **Conta il totale dei record senza filtri**
     cursor.execute("SELECT COUNT(*) FROM dati")
@@ -69,10 +76,12 @@ def get_data():
     cursor.execute(filtered_query, params)
     filtered_records = cursor.fetchone()[0]
 
-    # **Recupera solo i dati per la pagina corrente**
+    # **Recupera solo i dati per la pagina corrente con sorting**
     data_query = f"""
-        SELECT id, switch, vswitch, pidx, sp, speed, speed_sup, ctx, ctx_name, pn, state, status, wwpn, alias, role, zone, note
+        SELECT id, switch, vswitch, pidx, sp, speed, speed_sup, ctx, ctx_name, pn, state, status, 
+               wwpn, alias, role, zone, note
         {base_query}
+        ORDER BY {order_column} {order_direction}
         LIMIT ? OFFSET ?
     """
     params.extend([length, start])
@@ -87,7 +96,6 @@ def get_data():
         "recordsFiltered": filtered_records,  # ✅ Numero di record filtrati
         "data": data
     })
-
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)
