@@ -111,9 +111,24 @@
          let table = $('#dataTable').DataTable({
             dom: '<"top d-flex justify-content-between align-items-center"lB>rt<"bottom d-flex justify-content-between align-items-center"ip>',
             buttons: [
-                { extend: 'csv', text: '📄 CSV', className: 'btn btn-primary btn-sm' },
-                { extend: 'excel', text: '📊 Excel', className: 'btn btn-primary btn-sm' }
+                {
+                    extend: 'csv',
+                    text: '📄 CSV',
+                    className: 'btn btn-primary btn-sm',
+                    action: function(e, dt, node, config) {
+                        exportFilteredData('csv');
+                    }
+                },
+                {
+                    extend: 'excel',
+                    text: '📊 Excel',
+                    className: 'btn btn-primary btn-sm',
+                    action: function(e, dt, node, config) {
+                        exportFilteredData('excel');
+                    }
+                }
             ],
+
             "processing": true,
             "serverSide": true,
             "ajax": "/data",
@@ -163,8 +178,18 @@
                 menu.hide();
             }
          });
-      });
 
+         function exportFilteredData(format) {
+            let params = new URLSearchParams();
+            table.columns().every(function(index) {
+                let searchValue = this.search();
+                if (searchValue) {
+                    params.append(`columns[${index}][search][value]`, searchValue);
+                }
+            });
+            window.location.href = `/api/export?${params.toString()}&format=${format}`;
+        }
+      });
    </script>
 </body>
 </html>
