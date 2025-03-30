@@ -37,7 +37,6 @@
         <h3>Reindirizzamento in corso...</h3>
         <p>Attendi un momento e aggiorna il bookmark, stiamo portandoti alla nuova destinazione.</p>
         <p>Abbiamo introdotto l'uso di sqlite per migliorare le performance.</p>
-        <p>Direi che ci siamo riusciti!!! dicci la tua mailto:progettazione.st@intesasanpaolo.com</p>
         <p>Direi che ci siamo riusciti!!! Dicci la tua opinione:
            <a href="mailto:axxxa54@gmail.com">Axxx</a>
         </p>
