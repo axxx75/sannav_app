@@ -1,4 +1,4 @@
-from flask import Flask, jsonify, render_template, request
+from flask import Flask, jsonify, render_template, request, Response
 from datetime import datetime
 import sqlite3, os
 
@@ -46,7 +46,7 @@ def get_data():
 
     print("🟢 Parametri ricevuti:", request.args)  # DEBUG
 
-    columns = ["id", "switch", "vswitch", "pidx", "sp", "speed", "speed_sup", "ctx", 
+    columns = ["id", "switch", "vswitch", "pidx", "sp", "speed", "speed_sup", "ctx",
                "ctx_name", "pn", "state", "status", "wwpn", "alias", "role", "zone", "note"]
 
     # **Gestione della ricerca avanzata**
@@ -78,7 +78,7 @@ def get_data():
 
     # **Recupera solo i dati per la pagina corrente con sorting**
     data_query = f"""
-        SELECT id, switch, vswitch, pidx, sp, speed, speed_sup, ctx, ctx_name, pn, state, status, 
+        SELECT id, switch, vswitch, pidx, sp, speed, speed_sup, ctx, ctx_name, pn, state, status,
                wwpn, alias, role, zone, note
         {base_query}
         ORDER BY {order_column} {order_direction}
@@ -96,6 +96,59 @@ def get_data():
         "recordsFiltered": filtered_records,  # ✅ Numero di record filtrati
         "data": data
     })
+
+@app.route('/api/export', methods=['GET'])
+def export_filtered_data():
+    conn = get_db_connection()
+    cursor = conn.cursor()
+
+    base_query = "SELECT * FROM dati WHERE 1=1"
+    params = []
+    columns = ["id", "switch", "vswitch", "pidx", "sp", "speed", "speed_sup", "ctx", "ctx_name", "pn", "state", "status", "wwpn", "alias", "role", "zone", "note"]
+
+    # **Recuperiamo i parametri dei filtri dalla richiesta**
+    for i, col in enumerate(columns):
+        search_value = request.args.get(f'columns[{i}][search][value]', '').strip()
+        if search_value:
+            base_query += f" AND {col} LIKE ?"
+            params.append(f"%{search_value}%")
+
+    # **Eseguiamo la query filtrata**
+    cursor.execute(base_query, params)
+    rows = cursor.fetchall()
+    conn.close()
+
+    # **Formato di esportazione**
+    file_format = request.args.get('format', 'csv')
+
+    if file_format == 'csv':
+        def generate():
+            yield ','.join(columns) + '\n'
+            for row in rows:
+                yield ','.join(str(row[col]) if row[col] is not None else '' for col in columns) + '\n'
+
+        return Response(generate(), mimetype='text/csv', headers={"Content-Disposition": "attachment; filename=export.csv"})
+
+    elif file_format == 'excel':
+        import io
+        import xlsxwriter
+
+        output = io.BytesIO()
+        workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+        worksheet = workbook.add_worksheet()
+
+        # **Scriviamo i dati**
+        worksheet.write_row(0, 0, columns)
+        for row_idx, row in enumerate(rows, start=1):
+            worksheet.write_row(row_idx, 0, [row[col] if row[col] is not None else '' for col in columns])
+
+        workbook.close()
+        output.seek(0)
+
+        return Response(output, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                        headers={"Content-Disposition": "attachment; filename=export.xlsx"})
+
+    return jsonify({"error": "Formato non supportato"}), 400
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5001)
