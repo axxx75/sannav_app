@@ -31,6 +31,7 @@ COPY httpd.conf /etc/apache2/httpd.conf
 ADD app/ /app
 ADD page/ /var/www/localhost/htdocs
 RUN ln -s /app/sannav_pg_nodbg.py /app/sannav_pg.py
+RUN ln -s /app/result_json /var/www/localhost/htdocs/result_json
 
 # Espone la porta: 80 per Apache e la 5001 per Flask
 EXPOSE 80
