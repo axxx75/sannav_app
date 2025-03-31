@@ -132,11 +132,11 @@ def save_device_ports_report(ip_sannav, sannav_key):
     join_json1_2 = sorted(join_json1_2, key=lambda x: (x.get("pSwitch", "") or "", x.get("switchName", "") or "", str(x.get("number", 0))))
 
     # Salva il JSON unito in un file
-    if not os.path.exists('/var/www/localhost/htdocs/result_json'):
-        os.makedirs('/var/www/localhost/htdocs/result_json')
+    if not os.path.exists('/app/result_json'):
+        os.makedirs('/app/result_json')
 
     now = datetime.datetime.now()
-    filename = '/var/www/localhost/htdocs/result_json/device_port.json'
+    filename = '/app/result_json/device_port.json'
     with open(os.path.join('result_json', filename), 'w') as f:
         import json
         json.dump(join_json1_2, f, indent=4)
@@ -174,11 +174,11 @@ def save_switch_ports_report(ip_sannav, sannav_key):
     join_json1_2 = sorted(join_json1_2, key=lambda x: (x.get("pSwitch", "") or "", x.get("switchName", "") or "", str(x.get("portIndex", 0))))
 
     # Salva il JSON unito in un file
-    if not os.path.exists('/var/www/localhost/htdocs/result_json'):
-        os.makedirs('/var/www/localhost/htdocs/result_json')
+    if not os.path.exists('/app/result_json'):
+        os.makedirs('/app/result_json')
 
     now = datetime.datetime.now()
-    filename = '/var/www/localhost/htdocs/result_json/switch_port.json'
+    filename = '/app/result_json/switch_port.json'
     with open(os.path.join('result_json', filename), 'w') as f:
         import json
         json.dump(join_json1_2, f, indent=4)
@@ -187,11 +187,11 @@ def save_switch_ports_report(ip_sannav, sannav_key):
 
 
 ### ---
-#sannav_key = sannav_login(ip_sannav, username, password)
+sannav_key = sannav_login(ip_sannav, username, password)
 
-#save_device_ports_report(ip_sannav, sannav_key)
-#save_switch_ports_report(ip_sannav, sannav_key)
-#sannav_logout(sannav_key,ip_sannav)
+save_device_ports_report(ip_sannav, sannav_key)
+save_switch_ports_report(ip_sannav, sannav_key)
+sannav_logout(sannav_key,ip_sannav)
 
 def load_json(filename):
     with open(filename, "r", encoding="utf-8") as f:
