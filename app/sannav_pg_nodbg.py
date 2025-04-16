@@ -222,6 +222,8 @@ def generate_csv():
             if port.get("state") != "Offline":
                 continue
             speed = port.get("speed", "Unknown")
+            stat = port.get("status")
+
             if port.get("speedNegotiated") == 1:
                speed = "N" + str(speed)
             else:
@@ -229,6 +231,9 @@ def generate_csv():
 
             speed_sup_map = {32: "8,16,32_Gbps", 16: "4,8,16_Gbps", 8: "2,4,8_Gbps"}
             speed_sup = speed_sup_map.get(port.get("maxPortSpeed"), "")
+
+            if port.get("status") == "Disabled (Persistent)":
+                stat = f"{port.get('status')} - {port.get('statusMessage')}"
 
             row = {
               "SWITCH": port.get("pSwitch"),
@@ -241,7 +246,7 @@ def generate_csv():
               "CTX NAME": port.get("fabricName"),
               "PHY/NPIV": "Physical",
               "STATE": port.get("state"),
-              "STATUS": port.get("status"),
+              "STATUS": stat,
               "WWPN": "None",
               "ALIAS": "No_device_connected",
               "ROLE": "None",
@@ -270,10 +275,10 @@ def generate_csv():
             alias = "None"
             zone = "None"
             role = "None"
-            wwpn = switch_port_wwn if switch_port_wwn else "None"
+            wwpn = port.get("remotePortWwn")
 
             if matching_device:
-                wwpn = matching_device.get("wwn", switch_port_wwn)
+                #wwpn = matching_device.get("wwn", switch_port_wwn)
                 actzonec = matching_device.get("activeZoneCount")
                 alias = matching_device.get("zoneAlias", "")
                 zone = "None"
@@ -288,7 +293,7 @@ def generate_csv():
                 speed_sup = speed_sup_map.get(port.get("maxPortSpeed"), "")
 
                 if not alias:
-                    alias_f = matching_device.get("deviceSymbolicName") or port.get("remoteDevice") or matching_device.get("vendor")
+                    alias_f = matching_device.get("symbolicName") or matching_device.get("deviceSymbolicName") or port.get("remoteDevice") or matching_device.get("vendor")
                     alias = f"No_Alias - {alias_f}"
                 else:
                     if actzonec is None or actzonec == 0:
@@ -297,14 +302,14 @@ def generate_csv():
                     else:
                         zone = matching_device.get("activeZones", "")
 
-                role = matching_device.get("portRole", "None")
+                role = matching_device.get("portRole") or port.get("connectedDeviceType")
+                note = f"PortID: {port.get('portId')} matched in device file"
             else:
-                alias = f"No_Alias - {port.get('remoteDevice')}"
+                alias = f"No_Alias - {port.get('remoteDevice') }"
                 zone = "None"
-                role = "Switch"
-                wwpn = port.get("remoteNodeWwn")
+                role = port.get("connectedDeviceType")
+                note = f"PortID: {port.get('portId')} no match in device file"
 
-            note = f"PortID: {port.get('portId')}"
             if port.get("state") == "Online" and not switch_port_wwn:
                 note += " | WARNING: Porta online senza device"
 
